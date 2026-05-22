@@ -3,14 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Vinyl Vault | Music Catalogue</title>
-    <link rel="stylesheet" href="main.css">
-    <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-    <h1></h1>
+    <title>The Vinyl Vault | Premium Music Catalogue</title>
     
+    <!-- External Frameworks & Fonts -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Monoton&family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <!-- =========================================================
+         STYLE SHEET (CSS)
+         ========================================================= -->
+    <style>
+        /* --- Design Tokens & Variables --- */
+        :root {
+            --vinyl-black: #121212;
+            --paper-cream: #fdfaf5;
+            --accent-red: #e63946;
+            --shadow-soft: rgba(0, 0, 0, 0.08);
+            --shadow-hard: rgba(0, 0, 0, 0.15);
+            --transition-smooth: all 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        /* --- Global Resets & Typography --- */
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background-color: #f7f7f9;
+            color: var(--vinyl-black);
+            scroll-behavior: smooth;
+        }
+
+        .logo-font {
+            font-family: 'Monoton', cursive;
+        }
+
+        /* --- Record Card Components --- */
+        .record-card-container {
+            position: relative;
+            /* FIXED: Changed to visible so the vinyl disc is not clipped by the card's hover background */
+            overflow: visible; 
+            border-radius: 8px;
+            padding: 12px;
+            background: transparent;
+            transition: var(--transition-smooth);
+            z-index: 10; /* Base stacking order */
+        }
+
+        .record-card {
+            position: relative;
+            overflow: visible; 
+            transition: var(--transition-smooth);
+        }
+
+        /* --- The Vinyl Disc (Sliding Effect) --- */
+        .vinyl-disc {
+            position: absolute;
+            top: 4px;
+            right: 2px;
+            width: 95%;
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            z-index: 1; /* Sits directly behind the sleeve cover, but in front of the container background */
+            background: 
+                radial-gradient(circle, #222 15%, transparent 15.5%),
+                repeating-radial-gradient(circle, #111 0, #111 2px, #1a1a1a 4px);
+            transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            pointer-events: none;
+        }
+
+        /* Slide out over container bounds on hover */
+        .record-card-container:hover .vinyl-disc {
+            transform: translateX(38%) rotate(120deg);
+        }
+
+        /* FIXED: Raise the z-index of the hovered card so the disc slides in front of adjacent items */
+        .record-card-container:hover {
+            background: rgba(255, 255, 255, 0.90);
+            box-shadow: 0 10px 25px var(--shadow-soft);
+            z-index: 40; 
+        }
+
+        /* --- Sleeve (Front Album Cover) --- */
+        .sleeve {
+            position: relative;
+            z-index: 5; /* Sits firmly above the sliding vinyl disc */
+            background: #ffffff;
+            box-shadow: 4px 6px 15px var(--shadow-hard);
+            aspect-ratio: 1/1;
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            transition: var(--transition-smooth);
+        }
+
+        .sleeve img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: grayscale(15%);
+            transition: var(--transition-smooth);
+        }
+
+        .record-card-container:hover .sleeve img {
+            filter: grayscale(0%);
+            transform: scale(1.03);
+        }
+
+        /* --- Dynamic Navigation Elements --- */
+        .nav-link {
+            position: relative;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -6px;
+            left: 0;
+            background-color: var(--accent-red);
+            transition: width 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        .nav-link:hover::after, 
+        .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-link.active {
+            color: var(--accent-red);
+        }
+
+        /* --- Page Animation Transitions --- */
+        .page-section {
+            display: none;
+            animation: sectionTransition 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        @keyframes sectionTransition {
+            from { 
+                opacity: 0; 
+                transform: translateY(15px); 
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0); 
+            }
+        }
+
+        /* --- Hero Section Background --- */
+        .hero-gradient {
+            background: linear-gradient(135deg, #0d0d0d 0%, #262626 100%);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- =========================================================
+         NAVIGATION HEADER
+         ========================================================= -->
     <nav class="fixed top-0 w-full bg-white/90 backdrop-blur-md z-[100] border-b border-gray-100">
         <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <!-- Brand Logo -->
@@ -23,72 +177,200 @@
                 <span class="nav-link active" data-section="home" onclick="showSection('home')">Home</span>
                 <span class="nav-link" data-section="popular" onclick="showSection('popular')">Popular</span>
                 <span class="nav-link" data-section="new" onclick="showSection('new')">New Releases</span>
-                <span href="collection.html" class="nav-link" data-section="collection" onclick="showSection('collection')">Collection</span>
+                <span class="nav-link" data-section="collection" onclick="showSection('collection')">Collection</span>
+                <a class="nav-link" href="login.html">Login</a>
             </div>
 
             <!-- Header Action Button -->
             <div class="flex items-center gap-4">
-                <a href="register.html" class="bg-black text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-colors duration-300 inline-block">Join Vault</a>
+                <button class="bg-black text-white px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-widest hover:bg-red-600 transition-colors duration-300">
+                    Join Vault
+                </button>
             </div>
         </div>
     </nav>
-<section class="max-w-7xl mx-auto px-6 mt-32 mb-12">
 
-    <div class="flex flex-col md:flex-row gap-4 items-center justify-between">
-
-        <div>
-            <h1 class="text-6xl font-black uppercase tracking-tight">
-                The Vinyl Vault
-            </h1>
-
-            <p class="text-zinc-500 mt-3 uppercase tracking-[0.3em] text-sm">
-                Discover Albums. Build Collections. Review Music.
-            </p>
-        </div>
-
-        <div class="flex gap-3 w-full md:w-auto">
-
-            <input
-            id="searchInput"
-            type="text"
-            placeholder="Search albums..."
-            class="border border-zinc-300 rounded-full px-6 py-3 w-full md:w-[320px]">
-
-            <button
-            onclick="searchSpotify()"
-            class="bg-black text-white px-6 py-3 rounded-full hover:bg-red-600 transition">
-                Search
-            </button>
-
-        </div>
-    
-
-</section>
-
-    <main class="catalogue-grid">
-        <div class="record-card">
-            <div class="vinyl-disc"></div>
-            <div class="sleeve">
-                <img src="letitbleed.jpg" alt="Album Cover">
+    <!-- =========================================================
+         MAIN APPLICATION CONTENT
+         ========================================================= -->
+    <main class="pt-20 flex-grow">
+        
+        <!-- HOME SECTION -->
+        <section id="home" class="page-section active">
+            <!-- Hero Spotlight -->
+            <div class="hero-gradient text-white py-20 px-6 relative overflow-hidden">
+                <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12 relative z-10">
+                    <div class="flex-1 space-y-6">
+                        <span class="text-xs font-bold uppercase tracking-[0.4em] text-red-500">Premium Audio Experience</span>
+                        <h1 class="logo-font text-5xl md:text-7xl leading-tight">The Vinyl Vault</h1>
+                        <p class="text-gray-400 max-w-md text-base md:text-lg font-light tracking-wide leading-relaxed">
+                            Experience music as it was meant to be heard. Discover, collect, and spin legendary masterpieces.
+                        </p>
+                        <div class="pt-2">
+                            <button onclick="showSection('collection')" class="border border-white/30 hover:bg-white hover:text-black hover:border-white transition-all duration-300 px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest">
+                                Explore Store
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="flex-1 flex justify-center">
+                        <!-- Highlighting Hero Interaction Card -->
+                        <div class="relative w-64 h-64 md:w-80 md:h-80 record-card-container">
+                            <div class="record-card">
+                                <div class="vinyl-disc"></div>
+                                <div class="sleeve">
+                                    <img src="https://images.unsplash.com/photo-1603048588665-791ca8aea617?auto=format&fit=crop&q=80&w=800" alt="Featured Vinyl" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="info">
-                <p class="artist">The Rolling Stones</p>
-                <p class="album">Let It Bleed (1969)</p>
-            </div>
-        </div>
 
-        <div class="record-card">
-            <div class="vinyl-disc"></div>
-            <div class="sleeve">
-                <img src="kind of blue.jpg" alt="Album Cover">
+            <!-- Curated Staff Picks -->
+            <div class="max-w-7xl mx-auto py-20 px-6">
+                <h2 class="text-2xl font-bold uppercase tracking-wider mb-12 border-b-2 border-black pb-3 inline-block">Staff Picks</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-12" id="featured-grid">
+                    <!-- Loaded dynamically via JavaScript -->
+                </div>
             </div>
-            <div class="info">
-                <p class="artist">Miles Davis</p>
-                <p class="album">Kind of Blue (1959)</p>
+        </section>
+
+        <!-- POPULAR SECTION -->
+        <section id="popular" class="page-section">
+            <div class="max-w-7xl mx-auto py-16 px-6">
+                <div class="mb-12 border-l-4 border-black pl-4">
+                    <h2 class="logo-font text-4xl">Popular Records</h2>
+                    <p class="text-gray-500 uppercase tracking-widest text-xs mt-2">What the community is spinning right now</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12" id="popular-grid">
+                    <!-- Loaded dynamically via JavaScript -->
+                </div>
             </div>
-        </div>
+        </section>
+
+        <!-- NEW RELEASES SECTION -->
+        <section id="new" class="page-section">
+            <div class="max-w-7xl mx-auto py-16 px-6">
+                <div class="mb-12 border-l-4 border-red-600 pl-4">
+                    <h2 class="logo-font text-4xl text-red-600">Fresh Arrivals</h2>
+                    <p class="text-gray-500 uppercase tracking-widest text-xs mt-2">Latest pressings and modern classics</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12" id="new-grid">
+                    <!-- Loaded dynamically via JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- COLLECTION SECTION -->
+        <section id="collection" class="page-section">
+            <div class="max-w-7xl mx-auto py-16 px-6">
+                <div class="mb-12 border-l-4 border-gray-400 pl-4">
+                    <h2 class="logo-font text-4xl">Your Collection</h2>
+                    <p class="text-gray-500 uppercase tracking-widest text-xs mt-2">Your personalized high-fidelity selection</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12" id="collection-grid">
+                    <!-- Loaded dynamically via JavaScript -->
+                </div>
+            </div>
+        </section>
 
     </main>
-    <script src="app.js"></script>
+
+    <!-- =========================================================
+         FOOTER
+         ========================================================= -->
+    <footer class="bg-white border-t border-gray-100 py-12 mt-20 relative z-50">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h3 class="logo-font text-2xl tracking-widest mb-3">The Vinyl Vault</h3>
+            <p class="text-[10px] uppercase tracking-[0.4em] text-gray-400 mb-8">Analog Souls in a Digital World</p>
+            <div class="w-16 h-[1px] bg-gray-200 mx-auto mb-8"></div>
+            <p class="text-[10px] text-gray-400 tracking-wider">© 2026 THE VINYL VAULT CATALOGUE. ALL RIGHTS RESERVED.</p>
+        </div>
+    </footer>
+
+    <!-- =========================================================
+         JAVASCRIPT CONTROLLER
+         ========================================================= -->
+    <script>
+        /* --- Album Database Source --- */
+        const albums = [
+            { id: 1, artist: "Quadeca", title: "i didn't mean to haunt you", year: 2022, category: "new", img: "https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?auto=format&fit=crop&q=80&w=600" },
+            { id: 2, artist: "BCNR", title: "Ants From Up There", year: 2022, category: "new", img: "https://images.unsplash.com/photo-1539375665275-f9ad415ef9ac?auto=format&fit=crop&q=80&w=600" },
+            { id: 3, artist: "The Killers", title: "Hot Fuss", year: 2004, category: "popular", img: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&q=80&w=600" },
+            { id: 4, artist: "The Rolling Stones", title: "Let It Bleed", year: 1969, category: "collection", img: "https://images.unsplash.com/photo-1526218626217-dc65a29bb444?auto=format&fit=crop&q=80&w=600" },
+            { id: 5, artist: "Miles Davis", title: "Kind of Blue", year: 1959, category: "popular", img: "https://images.unsplash.com/photo-1511735111819-9a3f7709049c?auto=format&fit=crop&q=80&w=600" },
+            { id: 6, artist: "Arctic Monkeys", title: "The Car", year: 2022, category: "new", img: "https://images.unsplash.com/photo-1493225255756-d9584f8606e9?auto=format&fit=crop&q=80&w=600" },
+            { id: 7, artist: "Tame Impala", title: "Currents", year: 2015, category: "popular", img: "https://images.unsplash.com/photo-1508700115892-45ecd05ae2ad?auto=format&fit=crop&q=80&w=600" },
+            { id: 8, artist: "Pink Floyd", title: "Dark Side of the Moon", year: 1973, category: "collection", img: "https://images.unsplash.com/photo-1514525253361-b83f859b73c0?auto=format&fit=crop&q=80&w=600" }
+        ];
+
+        /**
+         * Generates standard markup for an individual record item
+         */
+        function createRecordCard(album) {
+            return `
+                <div class="record-card-container group">
+                    <div class="record-card">
+                        <div class="vinyl-disc"></div>
+                        <div class="sleeve">
+                            <img src="${album.img}" alt="${album.title}" />
+                        </div>
+                    </div>
+                    <div class="mt-5 text-center px-1">
+                        <p class="text-xs font-bold uppercase tracking-wider text-gray-900 truncate">${album.artist}</p>
+                        <p class="text-[11px] text-gray-500 italic mt-1 truncate">${album.title} (${album.year})</p>
+                        
+                        <!-- Overlay controls triggered gracefully on card hover -->
+                        <div class="mt-4 flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <button class="bg-black text-white text-[10px] font-bold uppercase tracking-wider px-3.5 py-1.5 rounded hover:bg-red-600 transition-colors">
+                                Details
+                            </button>
+                            <button class="border border-black text-[10px] font-bold uppercase tracking-wider px-3.5 py-1.5 rounded hover:bg-black hover:text-white transition-all">
+                                Add
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        /**
+         * Renders different arrays of albums into respective section grids
+         */
+        function renderAll() {
+            // Populate Home / Feature Section (Displaying first 4 albums)
+            document.getElementById('featured-grid').innerHTML = albums.slice(0, 4).map(createRecordCard).join('');
+            
+            // Populate Popular Grid Filter
+            document.getElementById('popular-grid').innerHTML = albums.filter(a => a.category === 'popular').map(createRecordCard).join('');
+            
+            // Populate New Arrivals Grid Filter
+            document.getElementById('new-grid').innerHTML = albums.filter(a => a.category === 'new').map(createRecordCard).join('');
+            
+            // Populate the General Collection Grid
+            document.getElementById('collection-grid').innerHTML = albums.map(createRecordCard).join('');
+        }
+
+        /**
+         * Simple SPA Navigation router logic
+         */
+        function showSection(sectionId) {
+            // Toggle active visibility styling on content sections
+            document.querySelectorAll('.page-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Highlight current active tab item in header
+            document.querySelectorAll('.nav-link').forEach(l => {
+                l.classList.toggle('active', l.getAttribute('data-section') === sectionId);
+            });
+            
+            // Bring window back up smoothly
+            window.scrollTo(0, 0);
+        }
+
+        // Initialize catalogue rendering on window load
+        window.onload = renderAll;
+    </script>
 </body>
 </html>
